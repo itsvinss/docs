@@ -1,0 +1,146 @@
+- The manin concept this is Shared Library Concept.
+- Users will be able to configure job type using YAML file placed in root directory
+  of the source code repository (Git Repository).
+- Users don't have to deal with pipeline code.
+- This can be done at folder level.
+- Features: Users will b able to select the input.YAML file as the source for the 
+  pipeline configuration.
+- Basic interface to parse and get build specifications from YAML file.
+- Convert the YAML configuration to declarative pipeline.
+- User will provide path to the script relative to the root directory of the repository without extension 
+  (.sh or .bat) in the YAML file. The plugin will generate pipeline script to detect the platform and call .sh or .bat script.
+
+Example:
+  Path provided: ./scripts/hello
+  a. On UNIX machine “./scripts/hello.sh” will be called
+  b. On non-UNIX machine “./scripts/hello.bat” will be called.
+
+
+-  Build description is defined via YAMl file stored within the SCM repo.
+-  Basic conversion of YAML to Declarative Pipeline: A class YamlToPipeline is 
+  written which will load the eg: "Jenkinsfile.yaml" and make use of 
+  PipelineSnippetGenerator class to generate Declarative pipeline code. 
+- Jenkinsfile.Yaml example: 
+
+ App:
+  name: WebApplication1.sln
+  repo: WebApplication1
+  package: WebApplication1.zip
+  solution_file: "C:\WebApplication1\WebApplication1.sln"
+  project_file: "C:\WebApplication1\WebApplication1.csproj"
+  app_dir: "C:\WebApplication1"
+
+- From the yaml file shown above, the plugin generates the 
+  following pipeline code:
+
+
+@Library('vinss1/jenkins-global-lib')
+
+import com.company.project.*
+
+
+def util = new com.company.project.util()
+
+
+pipeline {
+    agent any
+
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+	stage('Build the source code') {
+            steps {
+		script {
+		     echo "Building the source code  ... "
+
+		     commitMessage = util.getCommitMessage()
+
+		}
+		}
+		}
+
+	    stage ('Run the Unit Tests') {
+	    	steps {
+	    		script {
+			        print "Executing the unit tests ... "
+              print "cloing the common repository"
+              bat 'git clone "https://github.com/vinss1/CommonRepo.git"'
+              bat 'dir'
+		     		util.executeUnitTests()
+			    }
+	        }
+	    }
+
+
+        stage('build dll') {
+            steps {
+	    		script {
+		     		util.build()
+	        	}
+            }
+        }
+
+        stage('create package') {
+            steps {
+	    		script {
+		     		util.create_package()
+	        	}
+            }
+        }
+
+        stage('Deploy to Servers') {
+            steps {
+          script {
+            util.web_deploy()
+            }
+            }
+        }
+
+}
+post {
+        always {
+            echo 'One way or another, I have finished'
+            deleteDir() /* clean up our workspace */
+        }
+    }
+
+}
+
+- Problem solved:
+-  Easy to use by non-experts
+-  Jenkins Pipeline is Groovy DSL
+- Groovy DSL may be complex, even with declarative pipeline
+- YAML definations can be used to simplify
+
+
+What is needed:
+-list of Applications
+-Type of application
+-and how to build them.  (common functionality goes into shared Library)
+-deployment process
+-important is what is the software version being used to develop -
+    eg: windows slave Visual studio 14..
+
+-frontend web
+-console apps : .exe file
+-ssis : ispacfile
+-web apps - .net C# or angular5 (NPM-node package manager) NPM build 
+-input.YAMl : application name , solution file so it will go into build as per the application.
+-MSDeploy - it will go and deploy to the IIS which can be common. we create 1 script 
+-for the deployment and we call the shared function from all the applications.
+ 
+
+
+-Team
+-Application Type
+-Technology
+-Business Module
+-Release Frequency
+-Size
+
+1 application approx 2 weeks
