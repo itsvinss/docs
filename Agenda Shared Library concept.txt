@@ -1,4 +1,4 @@
-- The manin concept this is Shared Library Concept.
+- The main concept of this is Shared Library Concept.
 - Users will be able to configure job type using YAML file placed in root directory
   of the source code repository (Git Repository).
 - Users don't have to deal with pipeline code.
@@ -12,14 +12,14 @@
 
 Example:
   Path provided: ./scripts/hello
-  a. On UNIX machine ì./scripts/hello.shî will be called
-  b. On non-UNIX machine ì./scripts/hello.batî will be called.
+  a. On UNIX machine ‚Äú./scripts/hello.sh‚Äù will be called
+  b. On non-UNIX machine ‚Äú./scripts/hello.bat‚Äù will be called.
 
 
 -  Build description is defined via YAMl file stored within the SCM repo.
 -  Basic conversion of YAML to Declarative Pipeline: A class YamlToPipeline is 
-  written which will load the eg: "Jenkinsfile.yaml" and make use of 
-  PipelineSnippetGenerator class to generate Declarative pipeline code. 
+    written which will load the eg: "Jenkinsfile.yaml" and make use of 
+    PipelineSnippetGenerator class to generate Declarative pipeline code. 
 - Jenkinsfile.Yaml example: 
 
  App:
